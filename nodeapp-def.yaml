@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodeapp
+  namespace: test-cron
+  labels:
+    app: nodeapp
+  annotations:
+    fluxcd.io/automated: "true"
+    fluxcd.io/tag.app: semver:~1.0
+spec:
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: nodeapp
+  template:
+    metadata:
+      labels:
+        app: nodeapp
+    spec:
+      imagePullSecrets:
+      - name: my-nodeapp-registry-secret
+      containers:
+      - name: apps
+        image: registry.gitlab.com/benauca/my-nodejs-app:1.0.1136246905
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
