@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m0s
-  path: ./cluster/bbcron-cluster
+  path: ./clusters/bbcron-cluster
   prune: true
   sourceRef:
     kind: GitRepository

@@ -5,6 +5,7 @@ metadata:
   labels:
     app: postgres
   name: postgres
+  namespace: bbcron-dev
 spec:
   progressDeadlineSeconds: 2147483647
   replicas: 1
