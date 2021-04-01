@@ -1,0 +1,14 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: bbcron-dev-kustomization
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  path: ./cluster/bbcron-cluster
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: bbcron-git-config
+

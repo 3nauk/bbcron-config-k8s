@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: bbcron-development
+  name: keycloak-config
+  labels:
+    app: keycloak
+data:
+  ADMIN_USERNAME: bbcron
+  ADMIN_PASS: bbcron
+  DB_VENDOR: postgres
+  DB_ADDRESS: pg-keycloak
+  DB_ADDR: pg-keycloak
+  DATABASE_NAME: keycloak
+  DATABASE_USER: keycloak
+  DATABASE_PASS: password
+  # KEYCLOAK_VERSION - the Keycloak version to run
+

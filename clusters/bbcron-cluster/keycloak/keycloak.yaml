@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: bbcron-development
+  name: keycloak
+  labels:
+    app: keycloak
+spec:
+  selector:
+    app: keycloak
+  ports: 
+   - port: 8081
+     name: keycloak
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: bbcron-development
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+      - name: keycloak
+        env:         
+         - name: DB_ADDR
+           value: postgres
+         - name: DB_DATABASE
+           value: bbcron
+         - name: DB_PASSWORD
+           value: bbcron
+         - name: DB_USER
+           value: bbcron
+         - name: DB_VENDOR
+           value: POSTGRES
+         - name: KEYCLOAK_PASSWORD
+           value: bbcron
+         - name: KEYCLOAK_USER
+           value: bbcron
+         - name: KEYCLOAK_LOGLEVEL
+           value: DEBUG
+         - name: KEYCLOAK_VERSION
+           value: 10.0.2
+        image: mihaibob/keycloak:10.0.2
+        ports:
+        - name: http
+          containerPort: 8081
+        readinessProbe:
+          httpGet:
+            path: /auth/realms/master
+            port: 8081
+      initContainers:
+         - name: init-postgres-keycloak-service
+           image: busybox
+           command: ['sh', '-c', 'until nslookup postgres; do echo waiting for postgres-keycloak; sleep 2; done;']
+      restartPolicy: Always
+
