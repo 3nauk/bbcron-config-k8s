@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+   namespace: bbcron-dev # Como lo gestionamos como variable de entorno.
+   name: bbcron-eureka-svc
+   labels:
+      type: eureka
+spec:
+   selector:
+      app: bbcron-eureka
+   ports:
+      - protocol: TCP
+        port: 80
+        targetPort: 8765
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: bbcron-dev
+  name: bbcron-eureka-deployment
+  labels:
+    app: bbcron-eureka
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bbcron-eureka
+  template:
+    metadata:
+      namespace: bbcron-dev 
+      labels:
+        app: bbcron-eureka
+    spec:
+       containers:
+       - image: 3nauk/bbcron-eureka:ed5c066a3002c4a363d17f7d5a06df28938a5494
+         name: bbcron-eureka
+         env:       
+           - name: PORT_EUREKA
+             value: "8765"
+
