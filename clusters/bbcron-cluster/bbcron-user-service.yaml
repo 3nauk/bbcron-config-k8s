@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: bbcron-dev
+  name: bbcron-user-svc
+  labels:
+    app: bbcron-user
+spec:
+  selector:
+    app: bbcron-user
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8888
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    namespace: bbcron-dev
+    name: bbcron-user
+    labels:
+       app: bbcron-user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bbcron-user
+  template:
+    metadata:
+      name: bbcron-user
+      labels:
+        app: bbcron-user
+    spec:
+      containers:
+      - name: bbcron-user
+        image: 3nauk/bbcron-user-service:2aeaba8d45654e01d7ff993d1573fb4a135761b5
+        env: 
+          - name: USER_BBDD
+            value: jdbc:postgresql://postgres:5432/bbcron
+          - name: POSTGRES_DB
+            value: bbcron
+          - name: POSTGRES_PASSWORD
+            value: bbcron
+          - name: POSTGRES_USER
+            value: bbcron
+          - name: EUREKA_URI
+            value: http://bbcron-eureka-svc/eureka
+          - name: POSTGRESQL_URL
+            value: postgres
+          - name: POSTGRESQL_DBNAME
+            value: bbcron_user
+          - name: POSTGRESQL_USER
+            value: bbcron
+          - name: POSTGRESQL_PWD
+            value: bbcron
+
