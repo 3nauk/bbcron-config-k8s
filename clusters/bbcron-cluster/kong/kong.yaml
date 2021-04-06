@@ -1,0 +1,100 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: kong
+   namespace: bbcron-dev
+   labels:
+     app: kong
+     type: api
+spec:   
+  selector:
+    app: metrics
+  type: ClusterIP
+  ports:
+    - name: "8000"
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+    - name: "8443"
+      port: 8443
+      targetPort: 8443
+      protocol: TCP
+    - name: "8001"
+      port: 8001
+      targetPort: 8001
+      protocol: TCP
+    - name: "8444"
+      port: 8444
+      targetPort: 8444
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: kong
+   namespace: bbcron-dev
+   labels:
+      app: kong
+      type: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong
+  template:
+    metadata:
+      name: kong
+      labels:
+        app: kong
+    spec:
+      containers:
+        - image: 3nauk/kong-oicd-bbcron:1.0.0
+          name: bbcron-kong
+          ports:
+            - containerPort: 8000
+            - containerPort: 8443
+            - containerPort: 8001
+            - containerPort: 8444
+          env:
+            - name: LC_CTYPE
+              value: en_US.UTF-8
+            - name: LC_ALL
+              value: en_US.UTF-8
+            - name: KONG_DATABASE
+              value: postgres
+            - name: KONG_PG_HOST
+              value: postgres #kong-database
+            - name: KONG_PG_USER
+              value: kong
+            - name: KONG_PG_PASSWORD
+              value: kong
+            - name: KONG_CASSANDRA_CONTACT_POINTS
+              value: postgres #kong-database
+            - name: KONG_PROXY_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_PROXY_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_LISTEN
+              value: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+            - name: KONG_PLUGINS
+              value: oidc
+      initContainers:
+        - image: 3nauk/kong-oicd-bbcron:1.0.0
+          name: kong-oicd
+          env: 
+            - name: KONG_DATABASE
+              value: postgres
+            - name: KONG_PG_HOST
+              value: postgres
+            - name: KONG_PG_PASSWORD
+              value: kong
+            - name: KONG_CASSANDRA_CONTACT_POINTS
+              value: kong-database
+          command: ["kong", "migrations", "bootstrap"]
+
+

@@ -8,10 +8,12 @@ metadata:
 spec:
   selector:
     app: keycloak
-  ports: 
-   - port: 8081
-     name: keycloak
-  type: NodePort
+  type: ClusterIP
+  ports:
+    - name: "8180"
+      protocol: TCP
+      port: 8180
+      targetPort: 8180
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -49,17 +51,11 @@ spec:
            value: bbcron
          - name: KEYCLOAK_VERSION
            value: 10.0.2
+         - name: KEYCLOAK_LOGLEVEL
+           value: DEBUG
         image: mihaibob/keycloak:10.0.2
         ports:
         - name: http
-          containerPort: 8081
-        readinessProbe:
-          httpGet:
-            path: /auth/realms/master
-            port: 8081
-      initContainers:
-         - name: init-postgres-keycloak-service
-           image: busybox
-           command: ['sh', '-c', 'until nslookup postgres; do echo waiting for postgres-keycloak; sleep 2; done;']
+          containerPort: 8180
       restartPolicy: Always
 
