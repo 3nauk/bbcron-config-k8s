@@ -59,10 +59,10 @@ spec:
         ports:
         - name: http
           containerPort: 8180
-        - name: https:
+        - name: https
           containerPort: 8443
         readinessProbe:
           httpGet:
             path: /auth/realm/master
             port: 8180 
-
+      restartPolicy: Always
