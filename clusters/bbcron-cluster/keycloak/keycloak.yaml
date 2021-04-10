@@ -8,9 +8,9 @@ metadata:
 spec:
   selector:
     app: keycloak
-  type: ClusterIP
+  type: LoadBalancer
   ports:
-    - name: "8180"
+    - name: http
       protocol: TCP
       port: 8180
       targetPort: 8180
@@ -50,12 +50,19 @@ spec:
          - name: KEYCLOAK_USER
            value: bbcron
          - name: KEYCLOAK_VERSION
-           value: 10.0.2
+           value: 12.0.4        
          - name: KEYCLOAK_LOGLEVEL
-           value: DEBUG
-        image: mihaibob/keycloak:10.0.2
+           value: INFO
+         - name: PROXY_ADDRESS_FORWARDING
+           value: true
+        image: mihaibob/keycloak:12.0.4
         ports:
         - name: http
           containerPort: 8180
-      restartPolicy: Always
+        - name: https:
+          containerPort: 8443
+        readinessProbe:
+          httpGet:
+            path: /auth/realm/master
+            port: 8180 
 
